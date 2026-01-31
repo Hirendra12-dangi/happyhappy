@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Your Presence Impacts the World</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; background-color: #050705; overscroll-behavior: none; }
+
+        #ui {
+            position: absolute;
+            top: 20%;
+            width: 100%;
+            text-align: center;
+            color: #f0f0f0;
+            font-family: 'serif';
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 3s ease;
+        }
+
+        h1 { font-weight: 200; font-size: 1.8rem; letter-spacing: 3px; font-style: italic; text-shadow: 0 0 20px rgba(255,255,255,0.3); }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <h1>This is how your presence impacts the world.</h1>
+    </div>
+
+    <script>
+        let organisms = [];
+        let bloomTriggered = 0;
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            // Create a few coral fungus clusters
+            let count = windowWidth < 600 ? 5 : 12;
+            for (let i = 0; i < count; i++) {
+                organisms.push(new CoralFungus(random(width), height - random(20, 100)));
+            }
+        }
+
+        function draw() {
+            // Dark forest floor gradient
+            background(5, 10, 5);
+
+            // Draw mossy floor
+            noStroke();
+            fill(15, 30, 15);
+            rect(0, height - 120, width, 120);
+
+            for (let o of organisms) {
+                o.display();
+            }
+        }
+
+        function mousePressed() {
+            for (let o of organisms) {
+                let d = dist(mouseX, mouseY, o.x, o.y);
+                if (d < 100 && !o.isBloomed) {
+                    o.bloom();
+                    bloomTriggered++;
+                    if (bloomTriggered >= 2) document.getElementById('ui').style.opacity = 1;
+                }
+            }
+        }
+
+        class CoralFungus {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.isBloomed = false;
+                this.bloomLevel = 0;
+                this.seed = random(1000); // Unique shape for each fungus
+            }
+
+            bloom() {
+                this.isBloomed = true;
+            }
+
+            display() {
+                push();
+                translate(this.x, this.y);
+                randomSeed(this.seed);
+                this.drawCoral(0, 45, 0.8);
+
+                if (this.isBloomed && this.bloomLevel < 1) {
+                    this.bloomLevel += 0.02; // Smooth growing animation
+                }
+                pop();
+            }
+
+            // Recursive function to draw coral-like stems
+            drawCoral(depth, len, weight) {
+                stroke(255, 140, 0); // Vibrant Orange
+                strokeWeight(weight * 3);
+                line(0, 0, 0, -len);
+                translate(0, -len);
+
+                if (depth < 4) {
+                    for (let i = 0; i < 3; i++) {
+                        push();
+                        rotate(random(-PI/4, PI/4));
+                        this.drawCoral(depth + 1, len * 0.7, weight * 0.7);
+                        pop();
+                    }
+                } else {
+                    // We are at the tips! Draw flowers if bloomed
+                    if (this.isBloomed) {
+                        this.drawFlower();
+                    }
+                }
+            }
+
+            drawFlower() {
+                noStroke();
+                // Glowing white center
+                fill(255, 255, 255, 200 * this.bloomLevel);
+                ellipse(0, 0, 12 * this.bloomLevel);
+
+                // Tiny petals
+                fill(255, 250, 240, 230 * this.bloomLevel);
+                for(let i=0; i<5; i++) {
+                    push();
+                    rotate(TWO_PI/5 * i);
+                    ellipse(6 * this.bloomLevel, 0, 8 * this.bloomLevel, 5 * this.bloomLevel);
+                    pop();
+                }
+            }
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+    </script>
+</body>
+</html>

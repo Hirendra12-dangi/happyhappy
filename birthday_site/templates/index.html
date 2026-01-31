@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Happy Birthday!</title>
+</head>
+<body>
+    <div class="birthday-text" id="secret-msg">
+    Sweep the water
+    </div>
+    <svg style="display:none">
+      <filter id="water-filter">
+        <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" />
+      </filter>
+    </svg>
+
+    <style>
+        #waterCanvas {
+            filter: url(#water-filter) contrast(1.2) brightness(1.1);
+            mix-blend-mode: screen;
+        }
+    </style>
+
+    <canvas id="waterCanvas"></canvas>
+
+        <audio id="birthday-music" loop>
+            <source src="{{ url_for('static', filename='sounds/deep-underwater-ambience-tonal-dark-402568 (1).mp3') }}" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+        <button id="skip-btn" class="floating-bubble">Skip</button>
+
+    <script src="{{ url_for('static', filename='js/water.js') }}"></script>
+</body>
+</html>
